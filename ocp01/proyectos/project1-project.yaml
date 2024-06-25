@@ -1,0 +1,144 @@
+apiVersion: v1
+items:
+- apiVersion: argoproj.io/v1alpha1
+  kind: ApplicationSet
+  metadata:
+    name: project1-set
+  spec:
+    generators:
+    - list:
+        elements:
+        - env: dev
+          project: project1
+        - env: test
+          project: project1
+    template:
+      metadata:
+        finalizers:
+        - resources-finalizer.argocd.argoproj.io
+        name: '{{env}}-{{project}}'
+        namespace: openshift-gitops
+      spec:
+        destination:
+          namespace: '{{env}}-{{project}}'
+          server: https://kubernetes.default.svc
+        project: '{{project}}'
+        source:
+          directory:
+            recurse: true
+          path: ocp01/proyectos/{{project}}/{{env}}
+          repoURL: https://github.com/barmolla/openshift-gitops.git
+          targetRevision: main
+        syncPolicy: {}
+#        syncPolicy:
+#          automated:
+#            selfHeal: true
+#          syncOptions:
+#          - Validate=false
+#          - CreateNamespace=true
+#          - ApplyOutOfSyncOnly=true
+- apiVersion: argoproj.io/v1alpha1
+  kind: AppProject
+  metadata:
+    finalizers:
+    - resources-finalizer.argocd.argoproj.io
+    name: dev-project1
+  spec:
+    clusterResourceWhitelist:
+    - group: '*'
+      kind: Namespace
+    - group: '*'
+      kind: Secret
+    - group: '*'
+      kind: PersistentVolumeClaim
+    - group: '*'
+      kind: Pipeline
+    - group: '*'
+      kind: ServiceAccount
+    - group: '*'
+      kind: LimitRange
+    - group: "*"
+      kind: ResourceQuota
+    
+    destinations:
+    - namespace: dev-project1
+      server: https://kubernetes.default.svc
+    namespaceResourceBlacklist:
+    - group: ""
+      kind: NetworkPolicy
+    sourceRepos:
+    - '*'
+- apiVersion: argoproj.io/v1alpha1
+  kind: AppProject
+  metadata:
+    finalizers:
+    - resources-finalizer.argocd.argoproj.io
+    name: test-project1
+  spec:
+    clusterResourceWhitelist:
+    - group: '*'
+      kind: Namespace
+    - group: '*'
+      kind: Secret
+    - group: '*'
+      kind: PersistentVolumeClaim
+    - group: '*'
+      kind: Pipeline
+    - group: '*'
+      kind: ServiceAccount
+    - group: '*'
+      kind: LimitRange
+    - group: "*"
+      kind: ResourceQuota
+    
+    destinations:
+    - namespace: test-project1
+      server: https://kubernetes.default.svc
+    namespaceResourceBlacklist:
+    - group: ""
+      kind: NetworkPolicy
+    sourceRepos:
+    - '*'
+- apiVersion: argoproj.io/v1alpha1
+  kind: AppProject
+  metadata:
+    finalizers:
+    - resources-finalizer.argocd.argoproj.io
+    name: project1
+  spec:
+    clusterResourceWhitelist:
+    - group: '*'
+      kind: Namespace
+    - group: argoproj.io
+      kind: Application
+    - group: argoproj.io
+      kind: AppProject
+    - group: argoproj.io
+      kind: ApplicationSet
+    - group: '*'
+      kind: Secret
+    - group: '*'
+      kind: PersistentVolumeClaim
+    - group: '*'
+      kind: Pipeline
+    - group: '*'
+      kind: ServiceAccount
+    - group: '*'
+      kind: LimitRange
+    - group: "*"
+      kind: ResourceQuota
+    
+    destinations:
+    - namespace: openshift-gitops
+      server: https://kubernetes.default.svc
+    - namespace: dev-project1
+      server: https://kubernetes.default.svc
+    - namespace: test-project1
+      server: https://kubernetes.default.svc
+    namespaceResourceBlacklist:
+    - group: ""
+      kind: NetworkPolicy
+    sourceRepos:
+    - '*'
+kind: List
+metadata: {}

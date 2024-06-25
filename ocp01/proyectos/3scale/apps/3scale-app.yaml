@@ -1,0 +1,25 @@
+apiVersion: v1
+items:
+- apiVersion: argoproj.io/v1alpha1
+  kind: Application
+  metadata:
+    name: 3scale-app
+    namespace: openshift-gitops
+  spec:
+    destination:
+      namespace: 3scale
+      server: https://kubernetes.default.svc
+    project: 3scale
+    source:
+      path: .
+      repoURL: https://github.com/barmolla/3scale-gitops-wo-overlay.git
+      targetRevision: dev
+    syncPolicy: {}
+#    syncPolicy:
+#      automated:
+#        selfHeal: true
+#      syncOptions:
+#      - Validate=false
+#      - ApplyOutOfSyncOnly=true
+kind: List
+metadata: {}
