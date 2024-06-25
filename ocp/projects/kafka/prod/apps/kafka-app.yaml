@@ -9,14 +9,12 @@ items:
     namespace: openshift-gitops
   spec:
     destination:
-      #namespace: kafka
       namespace: prod-kafka
       server: https://kubernetes.default.svc
-    project: kafka
+    project: default
     source:
-      #path: .
       path: overlay/prod
-      repoURL: https://github.com/barmolla/kafka-gitops.git
+      repoURL: https://github.com/brianwolf/redhat-gitops-kafka.git
       targetRevision: main
     syncPolicy: {}
 #    syncPolicy:
@@ -25,3 +23,4 @@ items:
 #      syncOptions:
 #      - Validate=false
 #      - ApplyOutOfSyncOnly=true
+
